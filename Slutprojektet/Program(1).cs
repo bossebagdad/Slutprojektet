@@ -25,7 +25,7 @@ namespace Bussen
                 "1. Lägg till passagerare\t",
                 "2. Skriv ut fullständig passagerarlista\t",
                 "3. Skriv ut total ålder\t",
-                "4. Beräkna medelålder\t",
+                "4. Beräkna medelålder eller medellängd\t",
                 "5. Skriv ut äldsta passagerare\t",
                 "6. Hitta passagerare i visst åldersspann\t",
                 "7. Sortera passagera efter ålder\t",
@@ -221,7 +221,7 @@ namespace Bussen
                             Calc_total_age();
                             break;
                         case 3:
-                            calc_average_age();
+                            CalcAverage();
                             break;
                         case 4:
                             max_age();
@@ -266,14 +266,12 @@ namespace Bussen
 
         public void add_passenger()
         {
-            int newAge = 0;
-            double newHeight = 0;
-            string newSex = "";
 
             Console.Clear();
             Console.WriteLine("Lägg till Pasagerare");
             if (antal_passagerare <= 25)
             {
+                int newAge;
                 // loop for adding passenger age
                 while (true)
                 {
@@ -301,6 +299,7 @@ namespace Bussen
                         Console.ReadKey();
                     }
                 }
+                double newHeight;
                 while (true)
                 {
                     try
@@ -319,6 +318,7 @@ namespace Bussen
                         Console.ReadKey();
                     }
                 }
+                string newSex;
                 while (true)
                 {
                     try
@@ -423,12 +423,53 @@ namespace Bussen
 
         //Metoder för betyget C
 
-        public double calc_average_age()
+        public void CalcAverage()
+        {
+            bool keepGoing = true;
+
+            do
+            {
+                Console.Clear();
+
+                Console.WriteLine("Vill du ha medel[Å]lder eller [M]edelängd?");
+                string answer = Console.ReadLine().ToUpper();
+
+
+                if (answer == "Å")
+                {
+                    calc_average_age();
+                    Console.WriteLine("Vill du gå tillbaka till huvudmenyn? J/N");
+                    string input = Console.ReadLine();
+                    if (input == "J")
+                    {
+                        keepGoing = false;
+                    }
+                    else
+                        keepGoing = true;
+
+                }
+                else if (answer == "M")
+                {
+                    CalcAverageHeight();
+
+                    Console.WriteLine("Vill du gå tillbaka till huvudmenyn? J/N");
+                    string input = Console.ReadLine();
+                    if (input == "J")
+                    {
+                        keepGoing = false;
+                    }
+                    else
+                        keepGoing = true;
+                }
+
+
+            } while (keepGoing);
+
+        }
+        public void calc_average_age()
         {
             Console.Clear();
-            Console.WriteLine("Vill du ha medelålder eller medelängd?");
-            Console.ReadLine();
-            //if ()
+
             double sum = 0;
             foreach (Passagerare person in plats)
             {
@@ -445,10 +486,32 @@ namespace Bussen
             double aver = sum / (double)antal_passagerare;
             Console.WriteLine($"Medelåldern på alla passagerare är {aver} år");
             Console.ReadKey(true);
-            return aver;
+
             //Betyg C
             //Beräkna den genomsnittliga åldern. Kanske kan man tänka sig att denna metod ska returnera något annat värde än heltal?
             //För att koden ska fungera att köra så måste denna metod justeras, alternativt att man temporärt sätter metoden med void
+        }
+
+        public void CalcAverageHeight()
+        {
+            Console.Clear();
+
+            double sum = 0;
+            foreach (Passagerare person in plats)
+            {
+                if (person == null)
+                {
+                    continue;
+                }
+                else
+                {
+                    sum += person.NewHeight;
+                }
+
+            }
+            double aver = sum / (double)antal_passagerare;
+            Console.WriteLine($"Längden på alla passagerare är {aver} meter");
+            Console.ReadKey(true);
         }
 
         public int max_age()
@@ -612,19 +675,19 @@ namespace Bussen
             // Switch case på platsnummer.
             //skicka platsnummer in i metoden
             // baserat på personen som sitter på platsen så körs react och skriver ut det som ska stå. 
-            
-           
+
+
             //Betyg A
             //Vilken passagerare ska vi peta på?
             //Denna metod är valfri om man vill skoja till det lite, men är också bra ur lärosynpunkt.
             //Denna metod ska anropa en passagerares metod för hur de reagerar om man petar på dom (eng: poke)
             //Som ni kan läsa i projektbeskrivningen så får detta beteende baseras på ålder och kön.
         }
-        
+
         public void getting_off()
         {
             // Defining data
-            int seatNumber = 0;
+            int platsNummer = 0;
             int index = -1;
 
             Console.Clear();
@@ -632,14 +695,14 @@ namespace Bussen
             // Prints current passengers
             foreach (Passagerare person in plats)
             {
-                seatNumber++;
+                platsNummer++;
                 if (person == null)
                 {
-                    Console.WriteLine("Seatnumber {0}: This seat is empty", seatNumber);
+                    Console.WriteLine("Seatnumber {0}: This seat is empty", platsNummer);
                 }
                 else
                 {
-                    Console.WriteLine("Seatnumber {0}: {1}", seatNumber, person.NewAge);
+                    Console.WriteLine("Seatnumber {0}: {1}", platsNummer, person.NewAge);
                 }
             }
             Console.WriteLine("Choose a seatnumber for the \n" +
@@ -660,6 +723,7 @@ namespace Bussen
                     }
                     else
                     {
+                        antal_passagerare--;
                         break;  // Successful input
                     }
                 }
@@ -667,11 +731,6 @@ namespace Bussen
                 {
                     Console.WriteLine("Please write an integer.");
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-
             }
             // Output
             Console.WriteLine("\n{0} has now left the bus and \n" +
